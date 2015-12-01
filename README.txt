@@ -12,4 +12,6 @@ To do
  - make channels
  - login system
  - database
+ - conversation log (By channel)
+ - send/display images
  - Extra UI
