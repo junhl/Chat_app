@@ -28,32 +28,30 @@ io.on('connection', function (socket) {
   });
 
   // when the client emits 'add user', this listens and executes
-  socket.on('add user', function (username) {
+  socket.on('add user', function (username, room) {
     // we store the username in the socket session for this client
     socket.username = username;
-	socket.room = 'room1'; ////////////////////////////////////////////////////
+	socket.room = room; ////////////////////////////////////////////////////
     // add the client's username to the global list
     usernames[username] = username;
     ++numUsers;
     addedUser = true;
     socket.emit('login', {numUsers: numUsers});
-    // echo globally (all clients) that a person has connected
-    socket.broadcast.emit('user joined', {username: socket.username,numUsers: numUsers});
+    // echo globally (all clients) that a person has connected --> changed to room echo !
+    socket.broadcast.to(socket.room).emit('user joined', {username: socket.username,numUsers: numUsers, room: socket.room});
 	
 	////NEW STUFF HERE
-	socket.join('room1');
-	socket.broadcast.emit('updateroom', rooms, 'room1');
+	socket.join('Lobby');
+	socket.broadcast.emit('updateroom', rooms, 'Lobby');
   });
   // NEW STUFF
   socket.on('switchRoom', function(newroom){
+	  socket.broadcast.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
 	  socket.leave(socket.room);
 	  socket.join(newroom);
-	  socket.broadcaset.emit('user joined', {username: socket.username, numUsers: numUsers})
-	  socket.broadcaset.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
 	  socket.room = newroom;
-	  socket.emit('updateroom', rooms, newroom);
-	  
-	  
+	  socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
+	  //socket.emit('updateroom', rooms, newroom);	  
   });
 
   // when the client emits 'typing', we broadcast it to others

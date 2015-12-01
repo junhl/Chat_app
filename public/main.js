@@ -35,7 +35,7 @@ $(function() {
   // Sets the client's username
   function setUsername () {
     username = $usernameInput.val().trim();
-
+	room = 'Lobby';
     // If the username is valid
     if (username) {
       $loginPage.fadeOut();
@@ -44,7 +44,7 @@ $(function() {
       $currentInput = $inputMessage.focus();
 
       // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('add user', username, room);
     }
   }
 
@@ -203,6 +203,19 @@ $(function() {
   });
 
   // Click events
+  $("#Lobby").click(function() {
+	    newRoom = 'Lobby'
+        socket.emit('switchRoom', newRoom);
+  });
+  $("#room1").click(function() {
+	    newRoom = 'room1'
+        socket.emit('switchRoom', newRoom);
+  });
+  $("#room2").click(function() {
+	    newRoom = 'room2'
+        socket.emit('switchRoom', newRoom);
+  });
+  
 
   // Focus input when clicking anywhere on login page
   $loginPage.click(function () {
@@ -224,7 +237,7 @@ $(function() {
   socket.on('login', function (data) {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
+    var message = "Welcome to Socket.IO Chat – " + room;
     log(message, {
       prepend: true
     });
@@ -238,7 +251,7 @@ $(function() {
 
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('user joined', function (data) {
-    log(data.username + ' joined');
+    log(data.username + ' joined '+ data.room);
     addParticipantsMessage(data);
   });
 
@@ -262,7 +275,7 @@ $(function() {
 	$('#rooms').empty();
 	$.each(rooms, function(key,value){
 		if (value == curr_room){
-			$('#rooms').append('<div>' + '</div>')
+			$('#rooms').append('<div>' + value + '</div>')
 		}
 		else{
 			$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
