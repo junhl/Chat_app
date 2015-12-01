@@ -18,6 +18,7 @@ $(function() {
 
   // Prompt for setting a username
   var username;
+  var room;
   var connected = false;
   var typing = false;
   var lastTypingTime;
@@ -212,6 +213,10 @@ $(function() {
   $inputMessage.click(function () {
     $inputMessage.focus();
   });
+  //NNNNNNNNEEEEEEEWWWWWWWWWWWWWWWWWWWW
+  function switchRoom(room){
+		socket.emit('switchRoom', room);
+  }
 
   // Socket events
 
@@ -253,4 +258,16 @@ $(function() {
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
+  socket.on('updateroom', function (rooms, curr_room){
+	$('#rooms').empty();
+	$.each(rooms, function(key,value){
+		if (value == curr_room){
+			$('#rooms').append('<div>' + '</div>')
+		}
+		else{
+			$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
+			
+		}
+	})
+  })
 });

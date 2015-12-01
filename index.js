@@ -11,7 +11,8 @@ server.listen(port, function () {
 // Routing
 app.use(express.static(__dirname + '/public'));
 
-// Chatroom
+// Chatroom : rooms which are currently available in chat
+var rooms = ['Lobby','room1','room2'];
 
 // usernames which are currently connected to the chat
 var usernames = {};
@@ -23,13 +24,14 @@ io.on('connection', function (socket) {
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {username: socket.username,message: data});
+    socket.in(socket.room).emit('new message', {username: socket.username,message: data});
   });
 
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username) {
     // we store the username in the socket session for this client
     socket.username = username;
+	socket.room = 'room1'; ////////////////////////////////////////////////////
     // add the client's username to the global list
     usernames[username] = username;
     ++numUsers;
@@ -37,6 +39,21 @@ io.on('connection', function (socket) {
     socket.emit('login', {numUsers: numUsers});
     // echo globally (all clients) that a person has connected
     socket.broadcast.emit('user joined', {username: socket.username,numUsers: numUsers});
+	
+	////NEW STUFF HERE
+	socket.join('room1');
+	socket.broadcast.emit('updateroom', rooms, 'room1');
+  });
+  // NEW STUFF
+  socket.on('switchRoom', function(newroom){
+	  socket.leave(socket.room);
+	  socket.join(newroom);
+	  socket.broadcaset.emit('user joined', {username: socket.username, numUsers: numUsers})
+	  socket.broadcaset.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
+	  socket.room = newroom;
+	  socket.emit('updateroom', rooms, newroom);
+	  
+	  
   });
 
   // when the client emits 'typing', we broadcast it to others
@@ -58,6 +75,7 @@ io.on('connection', function (socket) {
 
       // echo globally that this client has left
       socket.broadcast.emit('user left', {username: socket.username,numUsers: numUsers});
-    }
+	  socket.leave(socket.room); // NEW
+	}
   });
 });
