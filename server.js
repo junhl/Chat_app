@@ -21,7 +21,10 @@ var flash    = require('connect-flash');
 
 require('./config/passport')(passport); // pass passport for configuration
 
-
+app.get('/channel', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(rooms));
+});
 
 // set up our express application
 app.use(morgan('dev')); // log every request to the console
@@ -58,6 +61,8 @@ server.listen(port, function () {
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/node_modules/angular'));
 app.use(express.static(__dirname + '/node_modules/socket.io/node_modules/socket.io-client'));
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist/js'));
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 console.log(__dirname);
 
 // Chatroom : rooms which are currently available in chat

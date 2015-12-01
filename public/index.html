@@ -6,6 +6,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div ng-app="chat">
+<div ng-controller="ChatController">
+<div style="width: 100%;">
+  <div style="float:right; width: 60%">
   <ul class="pages">
     <li class="chat page">
     <div>
@@ -25,10 +29,40 @@
       </div>
     </li>
   </ul>
-
+  </div>
+  </div>
+  <div style="float:left;">
+  <ul class="channels">
+        <li ng-repeat="channel in channels"
+            class="channel">
+          <button type="button" class="btn btn-primary btn-lg" ng-click="select(channel)" >{{channel}}</button>
+        </li>
+      </ul>
+  </div>
+</div>
+</div>
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="../socket.io/socket.io.js"></script>
   <script src="/main.js"></script>
   <script src="/angular.min.js"></script>
+  <script src="/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="/bootstrap.min.css">
 </body>
+
+<script>
+  angular.module('chat', [])
+    .controller('ChatController', ['$scope', '$http', '$window', function($scope, $http, $window) {
+
+      $scope.channels = ['Lobby'];
+
+      $http.get("/channel")
+        .success(function(response){
+          $scope.channels = response;
+        });
+
+      
+
+    }]);
+</script>
+
 </html>
