@@ -206,6 +206,7 @@ $(function() {
   $("#Lobby").click(function() {
 	    newRoom = 'Lobby'
         socket.emit('switchRoom', newRoom);
+        log("switched to Lobby");
   });
   $("#room1").click(function() {
 	    newRoom = 'room1'

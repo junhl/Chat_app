@@ -10,6 +10,8 @@ server.listen(port, function () {
 
 // Routing
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/node_modules/angular'));
+console.log(__dirname);
 
 // Chatroom : rooms which are currently available in chat
 var rooms = ['Lobby','room1','room2'];
@@ -19,6 +21,7 @@ var usernames = {};
 var numUsers = 0;
 
 io.on('connection', function (socket) {
+  console.log(__dirname);
   var addedUser = false;
 
   // when the client emits 'new message', this listens and executes
