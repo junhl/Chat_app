@@ -22,12 +22,12 @@
       </div>
       <input class="inputMessage" placeholder="Type your message !"/>
     </li>
-    <li class="login page">
+<!--     <li class="login page">
       <div class="form">
         <h3 class="title">What's your name?</h3>
         <input class="usernameInput" type="text" maxlength="14" />
       </div>
-    </li>
+    </li> -->
   </ul>
   </div>
   </div>
@@ -51,9 +51,16 @@
 
 <script>
   angular.module('chat', [])
-    .controller('ChatController', ['$scope', '$http', '$window', function($scope, $http, $window) {
+    .controller('ChatController', ['$scope', '$http', '$window', '$location',function($scope, $http, $window, $location) {
 
       $scope.channels = ['Lobby'];
+      var username = $location.absUrl();
+      //parsing the url
+      var pos = username.indexOf('=');
+      username = username.substring(pos+1);
+      console.log(username);
+
+      $scope.user = username;
 
       $http.get("/channel")
         .success(function(response){
