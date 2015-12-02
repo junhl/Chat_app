@@ -9,19 +9,32 @@ $(function() {
   // compatilibiy issues ?
   // Initialize variables
   var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
+  //var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
 
-  var $loginPage = $('.login.page'); // The login page
+  //var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
 
   // Prompt for setting a username
   var username;
+  var room;
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
+  //var $currentInput = $usernameInput.focus();
+
+  $.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results==null){
+       return null;
+    }
+    else{
+       return results[1] || 0;
+    }
+  }
+  
+  console.log($.urlParam('username'));  
 
   var socket = io();
 
@@ -30,21 +43,38 @@ $(function() {
     message += "We have " + data.numUsers + " friends in this room";
     log(message);
   }
+    username = $.urlParam('username');
+    room = 'Lobby';
+    //$loginPage.fadeOut();
+    $chatPage.show();
+    //$loginPage.off('click');
+    $currentInput = $inputMessage;
+
+      // Tell the server your username
+    socket.emit('add user', username, room);
 
   // Sets the client's username
   function setUsername () {
-    username = $usernameInput.val().trim();
-
-    // If the username is valid
-    if (username) {
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      $currentInput = $inputMessage.focus();
+    //username = $usernameInput.val().trim();
+    // username = $.urlParam('username');
+    // room = 'Lobby';
+    //$loginPage.fadeOut();
+    // $chatPage.show();
+    //$loginPage.off('click');
+    // $currentInput = $inputMessage.focus();
 
       // Tell the server your username
-      socket.emit('add user', username);
-    }
+    // socket.emit('add user', username, room);
+    // If the username is valid
+    // if (username) {
+    //   $loginPage.fadeOut();
+    //   $chatPage.show();
+    //   $loginPage.off('click');
+    //   $currentInput = $inputMessage.focus();
+
+    //   // Tell the server your username
+    //   socket.emit('add user', username, room);
+    // }
   }
 
   // Sends a chat message
@@ -183,7 +213,7 @@ $(function() {
   $window.keydown(function (event) {
     // Auto-focus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
+      //$currentInput.focus();
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
@@ -201,17 +231,21 @@ $(function() {
     updateTyping();
   });
 
-  // Click events
+  
 
   // Focus input when clicking anywhere on login page
-  $loginPage.click(function () {
-    $currentInput.focus();
-  });
+  // $loginPage.click(function () {
+  //   $currentInput.focus();
+  // });
 
   // Focus input when clicking on the message input's border
   $inputMessage.click(function () {
     $inputMessage.focus();
   });
+  //NNNNNNNNEEEEEEEWWWWWWWWWWWWWWWWWWWW
+  function switchRoom(room){
+		socket.emit('switchRoom', room);
+  }
 
   // Socket events
 
@@ -219,7 +253,7 @@ $(function() {
   socket.on('login', function (data) {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
+    var message = "Welcome to Socket.IO Chat – " + room;
     log(message, {
       prepend: true
     });
@@ -230,10 +264,14 @@ $(function() {
   socket.on('new message', function (data) {
     addChatMessage(data);
   });
+  socket.on('log', function(data) {
+    console.log("LOG CALLED");
+    log(data);
+  });
 
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('user joined', function (data) {
-    log(data.username + ' joined');
+    log(data.username + ' joined '+ data.room);
     addParticipantsMessage(data);
   });
 
@@ -253,4 +291,16 @@ $(function() {
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
+  socket.on('updateroom', function (rooms, curr_room){
+	$('#rooms').empty();
+	$.each(rooms, function(key,value){
+		if (value == curr_room){
+			$('#rooms').append('<div>' + value + '</div>')
+		}
+		else{
+			$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
+			
+		}
+	})
+  })
 });

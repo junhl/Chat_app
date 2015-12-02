@@ -5,6 +5,8 @@ node_modules/*
 Thumbs.db
 ehthumbs.db
 
+node_modules/*
+
 # Folder config file
 Desktop.ini
 

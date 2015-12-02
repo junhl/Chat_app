@@ -1,16 +1,68 @@
-var express = require('express');
-var app = express();
+// server.js
+
+// set up ======================================================================
+// get all the tools we need
+var express  = require('express');
+var session  = require('express-session');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+var app      = express();
+//Chat
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var port = process.env.PORT || 3000;
+var port     = process.env.PORT || 8080;
+
+var passport = require('passport');
+var flash    = require('connect-flash');
+
+// configuration ===============================================================
+// connect to our database
+
+require('./config/passport')(passport); // pass passport for configuration
+
+app.get('/channel', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(rooms));
+});
+
+// set up our express application
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+app.use(bodyParser.json());
+
+app.set('view engine', 'ejs'); // set up ejs for templating
+
+// required for passport
+app.use(session({
+	secret: 'vidyapathaisalwaysrunning',
+	resave: true,
+	saveUninitialized: true
+ } )); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
+
+// routes ======================================================================
+
+require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
 });
 
-// Routing
+//========Chat App Starts here=========
+
+//Routing
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/node_modules/angular'));
+app.use(express.static(__dirname + '/node_modules/socket.io/node_modules/socket.io-client'));
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist/js'));
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 console.log(__dirname);
 
 // Chatroom : rooms which are currently available in chat
@@ -27,6 +79,7 @@ io.on('connection', function (socket) {
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
+    console.log(socket.username + " in " + socket.room + " sent: " + data);
     socket.in(socket.room).emit('new message', {username: socket.username,message: data});
   });
 
@@ -57,15 +110,21 @@ io.on('connection', function (socket) {
 	  socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
 	  //socket.emit('updateroom', rooms, newroom);	  
   });
+    
   socket.on('addRoom', function(newroom){
     console.log("adding room: " + newroom);
     socket.broadcast.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
     socket.leave(socket.room);
     rooms.push(newroom);
     socket.join(newroom);
-    //socket.room = newroom;
+    socket.room = newroom;
     socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
+    socket.emit('log', 'switched to channel: ' + newroom);
     //socket.emit('updateroom', rooms, newroom);    
+  });
+
+  socket.on('log', function(data) {
+    socket.emit('log', data);
   });
 
   // when the client emits 'typing', we broadcast it to others
@@ -91,3 +150,13 @@ io.on('connection', function (socket) {
 	}
   });
 });
+
+// launch ======================================================================
+// app.listen(port);
+// console.log('The magic happens on port ' + port);
+
+
+
+
+
+
