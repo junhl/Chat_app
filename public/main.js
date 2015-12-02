@@ -231,21 +231,6 @@ $(function() {
     updateTyping();
   });
 
-  // Click events
-  $("#Lobby").click(function() {
-      console.log("lalalalalal");
-	    newRoom = 'Lobby'
-        socket.emit('switchRoom', newRoom);
-        log("switched to Lobby");
-  });
-  $("#room1").click(function() {
-	    newRoom = 'room1'
-        socket.emit('switchRoom', newRoom);
-  });
-  $("#room2").click(function() {
-	    newRoom = 'room2'
-        socket.emit('switchRoom', newRoom);
-  });
   
 
   // Focus input when clicking anywhere on login page

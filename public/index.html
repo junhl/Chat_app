@@ -12,11 +12,6 @@
   <div style="float:right; width: 60%">
   <ul class="pages">
     <li class="chat page">
-    <div>
-        <button id='Lobby'>Lobby</button>
-    <button id='aaroom1'>Room1</button>
-    <button id='aaroom2'>Room2</button>
-    </div>
       <div class="chatArea">
         <ul class="messages"></ul>
       </div>
@@ -85,7 +80,6 @@
       };
 
       var socket = io();
-      socket.emit('new message', "hellooooooooo");
 
       $scope.changeChannel = function(channel){
         console.log("Switching to "+ channel);
@@ -94,10 +88,21 @@
       };
 
       $scope.addChannel = function(channel){
-        console.log("Adding channel "+ channel);
-        socket.emit('addRoom', channel); 
-        $scope.channels.push(channel);
-        $scope.newChannel = "";
+        
+        $http.get("/channel")
+        .success(function(response){
+          $scope.channels = response;
+
+          if($scope.channels.indexOf(channel)>=0){
+          socket.emit('log', "The channel " + channel + " already exists");
+          $scope.newChannel = "";
+        }else{
+          console.log("Adding channel "+ channel);
+          socket.emit('addRoom', channel); 
+          $scope.channels.push(channel);
+          $scope.newChannel = "";
+        }
+        });
       };
 
     }]);

@@ -124,7 +124,6 @@ io.on('connection', function (socket) {
   });
 
   socket.on('log', function(data) {
-    console.log("LOG CALLED");
     socket.emit('log', data);
   });
 
