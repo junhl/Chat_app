@@ -14,8 +14,8 @@
     <li class="chat page">
     <div>
         <button id='Lobby'>Lobby</button>
-    <button id='room1'>Room1</button>
-    <button id='room2'>Room2</button>
+    <button id='aaroom1'>Room1</button>
+    <button id='aaroom2'>Room2</button>
     </div>
       <div class="chatArea">
         <ul class="messages"></ul>
@@ -32,10 +32,20 @@
   </div>
   </div>
   <div style="float:left;">
+  <div>
+  Add Channel: <input ng-model="newChannel">
+  <button id="Add Channel" type="button" class="btn btn-info btn-xs" ng-click="addChannel(newChannel)"> Add
+  </button>
+  <br>
+  <div align="center">
+  <button  id="refresh" type="button" class="btn btn-success btn-md" ng-click="refresh()"> refresh
+  </button>
+  </div>
+  </div>
   <ul class="channels">
         <li ng-repeat="channel in channels"
             class="channel">
-          <button type="button" class="btn btn-primary btn-lg" ng-click="select(channel)" >{{channel}}</button>
+          <button id={{channel}} type="button" class="btn btn-primary btn-lg btn-block" ng-click="changeChannel(channel)">{{channel}}</button>
         </li>
       </ul>
   </div>
@@ -67,7 +77,28 @@
           $scope.channels = response;
         });
 
-      
+      $scope.refresh = function(){
+        $http.get("/channel")
+        .success(function(response){
+          $scope.channels = response;
+        });
+      };
+
+      var socket = io();
+      socket.emit('new message', "hellooooooooo");
+
+      $scope.changeChannel = function(channel){
+        console.log("Switching to "+ channel);
+        socket.emit('switchRoom', channel);
+        socket.emit('log', 'switched to channel: ' + channel);
+      };
+
+      $scope.addChannel = function(channel){
+        console.log("Adding channel "+ channel);
+        socket.emit('addRoom', channel); 
+        $scope.channels.push(channel);
+        $scope.newChannel = "";
+      };
 
     }]);
 </script>

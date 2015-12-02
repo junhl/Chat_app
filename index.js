@@ -49,12 +49,23 @@ io.on('connection', function (socket) {
   });
   // NEW STUFF
   socket.on('switchRoom', function(newroom){
+    console.log("switchRoom to " + newroom);
 	  socket.broadcast.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
 	  socket.leave(socket.room);
 	  socket.join(newroom);
 	  socket.room = newroom;
 	  socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
 	  //socket.emit('updateroom', rooms, newroom);	  
+  });
+  socket.on('addRoom', function(newroom){
+    console.log("adding room: " + newroom);
+    socket.broadcast.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
+    socket.leave(socket.room);
+    rooms.push(newroom);
+    socket.join(newroom);
+    //socket.room = newroom;
+    socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
+    //socket.emit('updateroom', rooms, newroom);    
   });
 
   // when the client emits 'typing', we broadcast it to others

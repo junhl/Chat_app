@@ -48,7 +48,7 @@ $(function() {
     //$loginPage.fadeOut();
     $chatPage.show();
     //$loginPage.off('click');
-    $currentInput = $inputMessage.focus();
+    $currentInput = $inputMessage;
 
       // Tell the server your username
     socket.emit('add user', username, room);
@@ -213,7 +213,7 @@ $(function() {
   $window.keydown(function (event) {
     // Auto-focus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
+      //$currentInput.focus();
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
@@ -233,6 +233,7 @@ $(function() {
 
   // Click events
   $("#Lobby").click(function() {
+      console.log("lalalalalal");
 	    newRoom = 'Lobby'
         socket.emit('switchRoom', newRoom);
         log("switched to Lobby");
@@ -277,6 +278,10 @@ $(function() {
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
     addChatMessage(data);
+  });
+  socket.on('log', function(data) {
+    console.log("LOG CALLED");
+    log(data);
   });
 
   // Whenever the server emits 'user joined', log it in the chat body

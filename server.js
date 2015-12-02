@@ -79,6 +79,7 @@ io.on('connection', function (socket) {
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
+    console.log(socket.username + " in " + socket.room + " sent: " + data);
     socket.in(socket.room).emit('new message', {username: socket.username,message: data});
   });
 
@@ -101,12 +102,30 @@ io.on('connection', function (socket) {
   });
   // NEW STUFF
   socket.on('switchRoom', function(newroom){
+    console.log("switchRoom to " + newroom);
 	  socket.broadcast.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
 	  socket.leave(socket.room);
 	  socket.join(newroom);
 	  socket.room = newroom;
 	  socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
 	  //socket.emit('updateroom', rooms, newroom);	  
+  });
+    
+  socket.on('addRoom', function(newroom){
+    console.log("adding room: " + newroom);
+    socket.broadcast.to(socket.room).emit('user left', {username: socket.username,numUsers: numUsers});
+    socket.leave(socket.room);
+    rooms.push(newroom);
+    socket.join(newroom);
+    socket.room = newroom;
+    socket.broadcast.to(socket.room).emit('user joined', {username: socket.username, numUsers: numUsers, room: socket.room});
+    socket.emit('log', 'switched to channel: ' + newroom);
+    //socket.emit('updateroom', rooms, newroom);    
+  });
+
+  socket.on('log', function(data) {
+    console.log("LOG CALLED");
+    socket.emit('log', data);
   });
 
   // when the client emits 'typing', we broadcast it to others
