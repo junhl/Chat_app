@@ -113,11 +113,13 @@ ul {
 
 .chatArea {
   height: 100%;
+  
   padding-bottom: 60px;
 }
 
 .messages {
   height: 100%;
+  width: 75%;
   margin: 0;
   overflow-y: scroll;
   padding: 10px 20px 10px 20px;
@@ -146,5 +148,6 @@ ul {
   padding-left: 10px;
   position: absolute;
   right: 0;
-  width: 100%;
+  width: 75%;
+  
 }

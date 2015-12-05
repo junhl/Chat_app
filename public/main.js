@@ -9,11 +9,11 @@ $(function() {
   // compatilibiy issues ?
   // Initialize variables
   var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
+  //var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
 
-  var $loginPage = $('.login.page'); // The login page
+  //var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
 
   // Prompt for setting a username
@@ -22,7 +22,19 @@ $(function() {
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
+  //var $currentInput = $usernameInput.focus();
+
+  $.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results==null){
+       return null;
+    }
+    else{
+       return results[1] || 0;
+    }
+  }
+  
+  console.log($.urlParam('username'));  
 
   var socket = io();
 
@@ -31,21 +43,38 @@ $(function() {
     message += "We have " + data.numUsers + " friends in this room";
     log(message);
   }
+    username = $.urlParam('username');
+    room = 'Lobby';
+    //$loginPage.fadeOut();
+    $chatPage.show();
+    //$loginPage.off('click');
+    $currentInput = $inputMessage;
+
+      // Tell the server your username
+    socket.emit('add user', username, room);
 
   // Sets the client's username
   function setUsername () {
-    username = $usernameInput.val().trim();
-	room = 'Lobby';
-    // If the username is valid
-    if (username) {
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      $currentInput = $inputMessage.focus();
+    //username = $usernameInput.val().trim();
+    // username = $.urlParam('username');
+    // room = 'Lobby';
+    //$loginPage.fadeOut();
+    // $chatPage.show();
+    //$loginPage.off('click');
+    // $currentInput = $inputMessage.focus();
 
       // Tell the server your username
-      socket.emit('add user', username, room);
-    }
+    // socket.emit('add user', username, room);
+    // If the username is valid
+    // if (username) {
+    //   $loginPage.fadeOut();
+    //   $chatPage.show();
+    //   $loginPage.off('click');
+    //   $currentInput = $inputMessage.focus();
+
+    //   // Tell the server your username
+    //   socket.emit('add user', username, room);
+    // }
   }
 
   // Sends a chat message
@@ -184,7 +213,7 @@ $(function() {
   $window.keydown(function (event) {
     // Auto-focus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
+      //$currentInput.focus();
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
@@ -202,25 +231,12 @@ $(function() {
     updateTyping();
   });
 
-  // Click events
-  $("#Lobby").click(function() {
-	    newRoom = 'Lobby'
-        socket.emit('switchRoom', newRoom);
-  });
-  $("#room1").click(function() {
-	    newRoom = 'room1'
-        socket.emit('switchRoom', newRoom);
-  });
-  $("#room2").click(function() {
-	    newRoom = 'room2'
-        socket.emit('switchRoom', newRoom);
-  });
   
 
   // Focus input when clicking anywhere on login page
-  $loginPage.click(function () {
-    $currentInput.focus();
-  });
+  // $loginPage.click(function () {
+  //   $currentInput.focus();
+  // });
 
   // Focus input when clicking on the message input's border
   $inputMessage.click(function () {
@@ -237,7 +253,7 @@ $(function() {
   socket.on('login', function (data) {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – " + room;
+    var message = "Welcome to Chat-IT " + room;
     log(message, {
       prepend: true
     });
@@ -247,6 +263,10 @@ $(function() {
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
     addChatMessage(data);
+  });
+  socket.on('log', function(data) {
+    console.log("LOG CALLED");
+    log(data);
   });
 
   // Whenever the server emits 'user joined', log it in the chat body
