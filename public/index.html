@@ -1,115 +1,107 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Socket.IO Chat Example</title>
-  <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<title>Chat-IT | Friendly real-time chat</title>
+	<link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
-<div ng-app="chat">
-<div ng-controller="ChatController">
-<<<<<<< HEAD
-<div style="width: 60%;">
-=======
-<div style="width: 100%;">
->>>>>>> origin/temp
-  <div style="float:right; width: 60%">
-  <ul class="pages">
-    <li class="chat page">
-      <div class="chatArea">
-        <ul class="messages"></ul>
-      </div>
-      <input class="inputMessage" placeholder="Type your message !"/>
-    </li>
-<!--     <li class="login page">
-      <div class="form">
-        <h3 class="title">What's your name?</h3>
-        <input class="usernameInput" type="text" maxlength="14" />
-      </div>
-    </li> -->
-  </ul>
-  </div>
-  </div>
-  <div style="float:left;">
-  <div>
-  Add Channel: <input ng-model="newChannel">
-  <button id="Add Channel" type="button" class="btn btn-info btn-xs" ng-click="addChannel(newChannel)"> Add
-  </button>
-  <br>
-  <div align="center">
-  <button  id="refresh" type="button" class="btn btn-success btn-md" ng-click="refresh()"> refresh
-  </button>
-  </div>
-  </div>
-  <ul class="channels">
-        <li ng-repeat="channel in channels"
-            class="channel">
-          <button id={{channel}} type="button" class="btn btn-primary btn-lg btn-block" ng-click="changeChannel(channel)">{{channel}}</button>
-        </li>
-      </ul>
-  </div>
-</div>
-</div>
-  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="../socket.io/socket.io.js"></script>
-  <script src="/main.js"></script>
-  <script src="/angular.min.js"></script>
-  <script src="/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="/bootstrap.min.css">
+	<div ng-app="chat" class="page">
+		<div ng-controller="ChatController">
+		
+			<channelPanel>
+				<br>
+				Add Channel:
+				<input ng-model="newChannel"/>
+				<button id="Add Channel" ng-click="addChannel(newChannel)" type="button" class="btn btn-info btn-xs">Add</button>
+				<button id="refresh" ng-click="refresh()" type="button" class="btn btn-success btn-xs">Refresh</button>
+				<br>
+				<br>
+				
+				<div class="channels">
+					<div ng-repeat="channel in channels" class="channels">
+						<button id={{channel}} ng-click="changeChannel(channel)" type="button" class="btn btn-primary btn-lg btn-block">{{channel}}</button>
+					</div>
+				</div>
+			</channelPanel>
+			
+			<!-- Fix: inputMessage to not overlap chatArea, scrollbar of chatArea to be visible -->
+			<messagePanel>
+				<ul>
+					<li>
+						<div class="chatArea">
+							<ul class="messages"></ul>
+						</div>
+						<input class="inputMessage" placeholder="Enter a message"/>
+					</li>
+				</ul>
+			</messagePanel>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="../socket.io/socket.io.js"></script>
+	<script src="/main.js"></script>
+	<script src="/angular.min.js"></script>
+	<script src="/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="/bootstrap.min.css">
 </body>
 
 <script>
-  angular.module('chat', [])
-    .controller('ChatController', ['$scope', '$http', '$window', '$location',function($scope, $http, $window, $location) {
 
-      $scope.channels = ['Lobby'];
-      var username = $location.absUrl();
-      //parsing the url
-      var pos = username.indexOf('=');
-      username = username.substring(pos+1);
-      console.log(username);
+	angular.module('chat', [])
+  
+		.controller('ChatController', ['$scope', '$http', '$window', '$location',function($scope, $http, $window, $location) {
 
-      $scope.user = username;
+			$scope.channels = ['Lobby'];
+			var username = $location.absUrl();
+      
+			//parsing the url
+			var pos = username.indexOf('=');
+			username = username.substring(pos+1);
+			console.log(username);
 
-      $http.get("/channel")
-        .success(function(response){
-          $scope.channels = response;
-        });
+			$scope.user = username;
 
-      $scope.refresh = function(){
-        $http.get("/channel")
-        .success(function(response){
-          $scope.channels = response;
-        });
-      };
+			$http.get("/channel")
+			.success(function(response){
+				$scope.channels = response;
+			});
 
-      var socket = io();
+			$scope.refresh = function(){
+				$http.get("/channel")
+				.success(function(response){
+					$scope.channels = response;
+				});
+			};
 
-      $scope.changeChannel = function(channel){
-        console.log("Switching to "+ channel);
-        socket.emit('switchRoom', channel);
-        socket.emit('log', 'switched to channel: ' + channel);
-      };
+			var socket = io();
 
-      $scope.addChannel = function(channel){
+			$scope.changeChannel = function(channel){
+				console.log("Switching to "+ channel);
+				socket.emit('switchRoom', channel);
+				socket.emit('log', 'switched to channel: ' + channel);
+			};
+
+			$scope.addChannel = function(channel){
         
-        $http.get("/channel")
-        .success(function(response){
-          $scope.channels = response;
+				$http.get("/channel")
+				.success(function(response){
+					$scope.channels = response;
 
-          if($scope.channels.indexOf(channel)>=0){
-          socket.emit('log', "The channel " + channel + " already exists");
-          $scope.newChannel = "";
-        }else{
-          console.log("Adding channel "+ channel);
-          socket.emit('addRoom', channel); 
-          $scope.channels.push(channel);
-          $scope.newChannel = "";
-        }
-        });
-      };
+					if ($scope.channels.indexOf(channel)>=0){
+						socket.emit('log', "The channel " + channel + " already exists");
+						$scope.newChannel = "";
+					}
+					else {
+						console.log("Adding channel "+ channel);
+						socket.emit('addRoom', channel); 
+						$scope.channels.push(channel);
+						$scope.newChannel = "";
+					}
+				});
+			};
 
-    }]);
+		}]);
 </script>
 
 </html>
