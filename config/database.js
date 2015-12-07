@@ -3,7 +3,7 @@ module.exports = {
     'connection': {
         'host': 'localhost',
         'user': 'root',
-        'password': 'Qpfkahem21'
+        'password': ''
     },
 	'database': 'ChatDB',
     'users_table': 'users'
