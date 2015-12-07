@@ -9,21 +9,19 @@ $(function() {
   // compatilibiy issues ?
   // Initialize variables
   var $window = $(window);
-  //var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
 
-  //var $loginPage = $('.login.page'); // The login page
+  
   var $chatPage = $('.chat.page'); // The chatroom page
 
-  // Prompt for setting a username
+  // basic variables to use
   var username;
   var room;
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  //var $currentInput = $usernameInput.focus();
-
+  
   $.urlParam = function(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
     if (results==null){
@@ -53,36 +51,10 @@ $(function() {
       // Tell the server your username
     socket.emit('add user', username, room);
 
-  // Sets the client's username
-  function setUsername () {
-    //username = $usernameInput.val().trim();
-    // username = $.urlParam('username');
-    // room = 'Lobby';
-    //$loginPage.fadeOut();
-    // $chatPage.show();
-    //$loginPage.off('click');
-    // $currentInput = $inputMessage.focus();
-
-      // Tell the server your username
-    // socket.emit('add user', username, room);
-    // If the username is valid
-    // if (username) {
-    //   $loginPage.fadeOut();
-    //   $chatPage.show();
-    //   $loginPage.off('click');
-    //   $currentInput = $inputMessage.focus();
-
-    //   // Tell the server your username
-    //   socket.emit('add user', username, room);
-    // }
-  }
 
   // Sends a chat message
   function sendMessage () {
     var message = $inputMessage.val();
-    // Prevent markup from being injected into the message
-    //message = cleanInput(message);
-    // if there is a non-empty message and a socket connection
     if (message && connected) {
       $inputMessage.val('');
       addChatMessage({username: username,message: message});
@@ -97,9 +69,7 @@ $(function() {
     addMessageElement($el, options);
   }
 
-  // Adds the visual chat message to the message list
   function addChatMessage (data, options) {
-    // Don't fade the message in if there is an 'X was typing'
     var $typingMessages = getTypingMessages(data);
     options = options || {};
     if ($typingMessages.length !== 0) {
@@ -221,8 +191,6 @@ $(function() {
         sendMessage();
         socket.emit('stop typing');
         typing = false;
-      } else {
-        setUsername();
       }
     }
   });
@@ -230,13 +198,6 @@ $(function() {
   $inputMessage.on('input', function() {
     updateTyping();
   });
-
-  
-
-  // Focus input when clicking anywhere on login page
-  // $loginPage.click(function () {
-  //   $currentInput.focus();
-  // });
 
   // Focus input when clicking on the message input's border
   $inputMessage.click(function () {
