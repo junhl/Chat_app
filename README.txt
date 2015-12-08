@@ -1,3 +1,5 @@
+Github link:https://github.com/junhl/Chat_app
+
 Team member names:
 -Jun Ho Lee
 -Erica Ma
