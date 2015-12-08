@@ -1,23 +1,29 @@
-Following socket.io's tutorial
+Github link:https://github.com/junhl/Chat_app
 
-Done 
- - What you type will be broadcasted all users
- 
+Team member names:
+-Jun Ho Lee
+-Erica Ma
+-Yi Fan Zhou
 
-Requires : nodejs installed
-1. Install packages: `npm install`
-2. Edit the database configuration: `config/database.js' (provide credentials for user and password)
-3. Create the database schema: `node scripts/create_database.js'
-4. Launch: `node server.js'
-5. Visit in your browser at: `http://localhost:8080'
 
-NOTE: do not use server.js
+Technology used:
+-NodeJS backend
+-MySQL
+-AngularJS
+-Bootstrap
 
-To do
- - incoporate angularjs
- - make channels
- - login system
- - database
- - conversation log (By channel)
- - send/display images
- - Extra UI
+
+How to run this project:
+
+Requires : nodejs and mysql installed
+
+1. Install packages: 'npm install'
+2. Edit the database configuration: 'config/database.js' (provide credentials for user and password for your mysql setup)
+3. Create the database schema by running: 'node scripts/create_database.js'
+4. Launch: 'node server.js'
+5. Visit in your browser at:'http://localhost:8080'
+
+
+Note: 
+-This project is based on a demo chat app from socket.io
+-The login page is a demo on the passport.js framework from scotch.io
